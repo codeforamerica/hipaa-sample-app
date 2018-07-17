@@ -80,6 +80,4 @@ test:
 #
 production:
   <<: *default
-  database: hipaa-sample-app_production
-  username: hipaa-sample-app
-  password: <%= ENV['HIPAA-SAMPLE-APP_DATABASE_PASSWORD'] %>
+  url: <%= ENV['DATABASE_URL'] %>
