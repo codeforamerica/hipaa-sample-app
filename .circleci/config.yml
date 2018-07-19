@@ -38,7 +38,6 @@ jobs:
 
       - run:
           name: install eb cli
-          working_directory: /
           command: |
             sudo apt-get -y -qq update
             sudo apt-get install python-pip python-dev build-essential
