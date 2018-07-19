@@ -1,6 +1,0 @@
-files:
-  - log/production.log
-destination:
-  host: logs7.papertrailapp.com # NOTE: change this to YOUR papertrail host!
-  port: 47026   # NOTE: change to your Papertrail port
-  protocol: tls
