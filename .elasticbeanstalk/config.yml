@@ -1,0 +1,11 @@
+branch-defaults:
+  master:
+    environment: hipaa-sample-app-puma-cli-dev
+global:
+  application_name: hipaa-sample-app-puma-cli
+  default_ec2_keyname: aws-eb
+  default_platform: Ruby 2.5 (Puma)
+  default_region: us-east-2
+  include_git_submodules: true
+  sc: git
+  workspace_type: Application
