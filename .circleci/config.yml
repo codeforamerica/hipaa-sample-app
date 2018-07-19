@@ -45,7 +45,7 @@ jobs:
 
       - run:
           name: Deploying
-          command: eb deploy hipaa-sample-app-puma-cli-dev
+          command: eb deploy --profile default
 
 workflows:
   version: 2
