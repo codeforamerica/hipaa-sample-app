@@ -8,34 +8,32 @@ defaults: &defaults
   docker:
     - image: circleci/ruby:2.5.1-browsers
 
-build_steps: &build_steps
-  - checkout
-  - restore_cache:
-      keys:
-      - v1-dependencies-{{ checksum "Gemfile.lock" }}
-      - v1-dependencies-
-  - run:
-      name: install dependencies
-      command: |
-        bundle install --jobs=4 --retry=3 --path vendor/bundle
-  - save_cache:
-      paths:
-        - ./vendor/bundle
-      key: v1-dependencies-{{ checksum "Gemfile.lock" }}
-
-  - run:
-      name: install eb cli
-      command: |
-        sudo apt-get -y -qq update
-        sudo apt-get install python-pip python-dev build-essential
-        sudo pip install awsebcli --upgrade
-
 version: 2
 jobs:
   deploy-staging:
     <<: *defaults
     steps:
-      <<: *build_steps
+      - checkout
+      - restore_cache:
+          keys:
+          - v1-dependencies-{{ checksum "Gemfile.lock" }}
+          - v1-dependencies-
+      - run:
+          name: install dependencies
+          command: |
+            bundle install --jobs=4 --retry=3 --path vendor/bundle
+      - save_cache:
+          paths:
+            - ./vendor/bundle
+          key: v1-dependencies-{{ checksum "Gemfile.lock" }}
+
+      - run:
+          name: install eb cli
+          command: |
+            sudo apt-get -y -qq update
+            sudo apt-get install python-pip python-dev build-essential
+            sudo pip install awsebcli --upgrade
+
       - run:
           name: deploy staging
           command: eb deploy hipaa-sample-staging
@@ -43,7 +41,27 @@ jobs:
   deploy-demo:
     <<: *defaults
     steps:
-      <<: *build_steps
+      - checkout
+      - restore_cache:
+          keys:
+          - v1-dependencies-{{ checksum "Gemfile.lock" }}
+          - v1-dependencies-
+      - run:
+          name: install dependencies
+          command: |
+            bundle install --jobs=4 --retry=3 --path vendor/bundle
+      - save_cache:
+          paths:
+            - ./vendor/bundle
+          key: v1-dependencies-{{ checksum "Gemfile.lock" }}
+
+      - run:
+          name: install eb cli
+          command: |
+            sudo apt-get -y -qq update
+            sudo apt-get install python-pip python-dev build-essential
+            sudo pip install awsebcli --upgrade
+
       - run:
           name: deploy demo
           command: eb deploy hipaa-sample-demo
