@@ -1,6 +1,3 @@
-branch-defaults:
-  master:
-    environment: hipaa-sample-app-puma-cli-dev
 global:
   application_name: hipaa-sample-app-puma-cli
   default_ec2_keyname: aws-eb

@@ -44,8 +44,8 @@ jobs:
             sudo pip install awsebcli --upgrade
 
       - run:
-          name: Deploying
-          command: eb deploy
+          name: deploy staging
+          command: eb deploy hipaa-sample-staging
 
 workflows:
   version: 2
