@@ -38,6 +38,16 @@ jobs:
           name: deploy staging
           command: eb deploy hipaa-sample-staging
 
+
+  tag-as-promoted:
+    <<: *defaults
+    steps:
+      - checkout
+
+      - run:
+          name: tag as promoted
+          command: cd repo; git tag v-$CIRCLE_JOB-$CIRCLE_SHA1; git push --tags
+
   deploy-demo:
     <<: *defaults
     steps:
@@ -79,9 +89,12 @@ workflows:
           type: approval
           requires:
             - deploy-staging
-      - deploy-demo:
+      - tag-as-promoted:
           requires:
             - promote-to-demo
+      - deploy-demo:
+          requires:
+            - tag-as-promoted
 #  deploy-demo:
 #    jobs:
 #      - deploy-demo:
