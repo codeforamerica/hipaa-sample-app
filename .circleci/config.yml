@@ -75,10 +75,13 @@ workflows:
             branches:
               only:
                 - master
-      - deploy-demo:
+      - promote-to-demo:
           type: approval
           requires:
            - deploy-staging
+       - deploy-demo:
+          requires:
+           - promote-to-demo
 #  deploy-demo:
 #    jobs:
 #      - deploy-demo:
