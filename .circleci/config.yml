@@ -4,7 +4,7 @@
 #
 
 defaults: &defaults
-  working_directory: ~
+  working_directory: ~/repo
   docker:
     - image: circleci/ruby:2.5.1-browsers
 
@@ -46,7 +46,7 @@ jobs:
 
       - run:
           name: tag as promoted
-          command: cd repo; git tag v-$CIRCLE_JOB-$CIRCLE_SHA1; git push --tags
+          command: git tag v-$CIRCLE_JOB-$CIRCLE_SHA1; git push --tags
 
   deploy-demo:
     <<: *defaults
@@ -95,11 +95,3 @@ workflows:
       - deploy-demo:
           requires:
             - tag-as-promoted
-#  deploy-demo:
-#    jobs:
-#      - deploy-demo:
-#          requires:
-#            - tag-for-prod-deploy
-#          filters:
-#            tags:
-#              only: /^deploy-v.*/
