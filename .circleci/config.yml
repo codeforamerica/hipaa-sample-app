@@ -78,10 +78,10 @@ workflows:
       - promote-to-demo:
           type: approval
           requires:
-           - deploy-staging
-       - deploy-demo:
+            - deploy-staging
+      - deploy-demo:
           requires:
-           - promote-to-demo
+            - promote-to-demo
 #  deploy-demo:
 #    jobs:
 #      - deploy-demo:
