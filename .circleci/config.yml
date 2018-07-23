@@ -2,20 +2,16 @@
 #
 # Check https://circleci.com/docs/2.0/language-ruby/ for more details
 #
+
+defaults: &defaults
+  working_directory: ~
+  docker:
+    - image: circleci/ruby:2.5.1-browsers
+
 version: 2
 jobs:
-  deploy:
-    docker:
-      # specify the version you desire here
-       - image: circleci/ruby:2.5.1-browsers
-
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/postgres:9.4
-
-    working_directory: ~/repo
-
+  build:
+    <<: *defaults
     steps:
       - checkout
 
@@ -43,16 +39,51 @@ jobs:
             sudo apt-get install python-pip python-dev build-essential
             sudo pip install awsebcli --upgrade
 
+      - persist_to_workspace:
+          root: workspace
+          paths:
+            - repo
+
+  deploy-staging:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/workspace/repo
       - run:
           name: deploy staging
           command: eb deploy hipaa-sample-staging
+
+  deploy-demo:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/workspace/repo
+    steps:
+      - run:
+          name: deploy staging
+          command: eb deploy hipaa-sample-demo
 
 workflows:
   version: 2
   build:
     jobs:
-      - deploy:
+      - build:
           filters:
             branches:
               only:
                 - master
+      - deploy-staging:
+          requires:
+            - build
+      - deploy-demo:
+          type: approval
+          requires:
+           - deploy-staging
+#  deploy-demo:
+#    jobs:
+#      - deploy-demo:
+#          requires:
+#            - tag-for-prod-deploy
+#          filters:
+#            tags:
+#              only: /^deploy-v.*/
