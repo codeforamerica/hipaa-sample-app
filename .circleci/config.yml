@@ -6,7 +6,7 @@
 defaults: &defaults
   working_directory: ~/repo
   docker:
-    - image: circleci/ruby:2.5.1-browsers
+    - image: chartsockcfa/hipaa-sample-ci:initial
 
 version: 2
 jobs:
@@ -14,25 +14,21 @@ jobs:
     <<: *defaults
     steps:
       - checkout
+
       - restore_cache:
           keys:
           - v1-dependencies-{{ checksum "Gemfile.lock" }}
           - v1-dependencies-
+
       - run:
           name: install dependencies
           command: |
             bundle install --jobs=4 --retry=3 --path vendor/bundle
+
       - save_cache:
           paths:
             - ./vendor/bundle
           key: v1-dependencies-{{ checksum "Gemfile.lock" }}
-
-      - run:
-          name: install eb cli
-          command: |
-            sudo apt-get -y -qq update
-            sudo apt-get install python-pip python-dev build-essential
-            sudo pip install awsebcli --upgrade
 
       - run:
           name: deploy staging
@@ -69,13 +65,6 @@ jobs:
           key: v1-dependencies-{{ checksum "Gemfile.lock" }}
 
       - run:
-          name: install eb cli
-          command: |
-            sudo apt-get -y -qq update
-            sudo apt-get install python-pip python-dev build-essential
-            sudo pip install awsebcli --upgrade
-
-      - run:
           name: deploy demo
           command: eb deploy hipaa-sample-demo
 
@@ -100,13 +89,6 @@ jobs:
           key: v1-dependencies-{{ checksum "Gemfile.lock" }}
 
       - run:
-          name: install eb cli
-          command: |
-            sudo apt-get -y -qq update
-            sudo apt-get install python-pip python-dev build-essential
-            sudo pip install awsebcli --upgrade
-
-      - run:
           name: deploy production2
           command: eb deploy hipaa-sample-production2
 
@@ -119,13 +101,13 @@ workflows:
             branches:
               only:
                 - master
-      - promote-to-demo:
+      - approve-for-production:
           type: approval
           requires:
             - deploy-staging
       - tag-as-promoted:
           requires:
-            - promote-to-demo
+            - approve-for-production
       - deploy-demo:
           requires:
             - tag-as-promoted
