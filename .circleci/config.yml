@@ -6,7 +6,7 @@
 defaults: &defaults
   working_directory: ~/repo
   docker:
-    - image: chartsockcfa/hipaa-sample-ci:initial
+    - image: chartsockcfa/hipaa-sample-ci:2
       environment:
         PGHOST: 127.0.0.1
         PGUSER: root
