@@ -147,7 +147,7 @@ workflows:
             - approve-for-production
       - deploy-demo:
           requires:
-            - tag-as-promoted
+            - approve-for-production
       - deploy-production:
           requires:
-            - tag-as-promoted
+            - approve-for-production
