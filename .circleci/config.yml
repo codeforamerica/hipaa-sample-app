@@ -20,6 +20,22 @@ defaults: &defaults
 
 version: 2
 jobs:
+  install_dependencies:
+    <<: *defaults
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+          - v1-dependencies-{{ checksum "Gemfile.lock" }}
+          - v1-dependencies-
+
+      - run: bundle install --jobs=4 --retry=3 --path vendor/bundle
+
+      - save_cache:
+          paths:
+            - ./vendor/bundle
+          key: v1-dependencies-{{ checksum "Gemfile.lock" }}
+
   run_checks:
     <<: *defaults
     steps:
@@ -30,13 +46,39 @@ jobs:
           - v1-dependencies-{{ checksum "Gemfile.lock" }}
           - v1-dependencies-
 
-      - run: bundle install --jobs=4 --retry=3 --path vendor/bundle
       - run: bundle exec bundle-audit update && bundle exec bundle-audit check
 
-      - save_cache:
-          paths:
-            - ./vendor/bundle
-          key: v1-dependencies-{{ checksum "Gemfile.lock" }}
+  run_tests:
+    <<: *defaults
+    steps:
+      - checkout
+
+      - restore_cache:
+          keys:
+          - v1-dependencies-{{ checksum "Gemfile.lock" }}
+          - v1-dependencies-
+
+      - run: bundle exec rake db:create
+      - run: bundle exec rake db:schema:load
+
+      - run:
+          name: run tests
+          command: |
+            mkdir /tmp/test-results
+            TEST_FILES="$(circleci tests glob "spec/**/*_spec.rb" | circleci tests split --split-by=timings)"
+            bundle exec rspec --format progress \
+                            --format RspecJunitFormatter \
+                            --out /tmp/test-results/rspec.xml \
+                            --format progress \
+                            -- \
+                            $TEST_FILES
+      # collect reports
+      - store_test_results:
+          path: /tmp/test-results
+
+      - store_artifacts:
+          path: /tmp/test-results
+          destination: test-results
 
   deploy-staging:
     <<: *defaults
@@ -94,7 +136,13 @@ workflows:
   version: 2
   build:
     jobs:
-      - run_checks
+      - install_dependencies
+      - run_checks:
+          requires:
+             - install_dependencies
+      - run_tests:
+          requires:
+             - install_dependencies
       - deploy-staging:
           filters:
             branches:
@@ -102,6 +150,7 @@ workflows:
                 - master
           requires:
             - run_checks
+            - run_tests
       - approve-for-production:
           type: approval
           requires:
