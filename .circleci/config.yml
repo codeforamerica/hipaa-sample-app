@@ -13,15 +13,11 @@ defaults: &defaults
         RAILS_ENV: test
         RACK_ENV: test
 
-    - image: circleci/postgres:9.6.2-alpine
-      environment:
-        POSTGRES_USER: root
-        POSTGRES_DB: circle-test_test
-
 version: 2
 jobs:
   install_dependencies:
     <<: *defaults
+
     steps:
       - checkout
       - restore_cache:
@@ -51,6 +47,11 @@ jobs:
 
   run_tests:
     <<: *defaults
+      - image: circleci/postgres:9.6.2-alpine
+        environment:
+          POSTGRES_USER: root
+          POSTGRES_DB: circle-test_test
+
     steps:
       - checkout
 
@@ -96,6 +97,10 @@ jobs:
     <<: *defaults
     steps:
       - checkout
+
+      - add_ssh_keys:
+          fingerprints:
+            - "47:c6:dc:62:5a:8b:8a:ed:25:59:42:e3:98:2c:d2:04"
 
       - run:
           name: tag as promoted
