@@ -46,6 +46,7 @@ jobs:
           - v1-dependencies-{{ checksum "Gemfile.lock" }}
           - v1-dependencies-
 
+      - run: bundle --path vendor/bundle
       - run: bundle exec bundle-audit update && bundle exec bundle-audit check
 
   run_tests:
@@ -58,6 +59,7 @@ jobs:
           - v1-dependencies-{{ checksum "Gemfile.lock" }}
           - v1-dependencies-
 
+      - run: bundle --path vendor/bundle
       - run: bundle exec rake db:create
       - run: bundle exec rake db:schema:load
 
@@ -85,11 +87,6 @@ jobs:
     steps:
       - checkout
 
-      - restore_cache:
-          keys:
-          - v1-dependencies-{{ checksum "Gemfile.lock" }}
-          - v1-dependencies-
-
       - run:
           name: deploy staging
           command: eb deploy hipaa-sample-staging
@@ -109,11 +106,6 @@ jobs:
     steps:
       - checkout
 
-      - restore_cache:
-          keys:
-          - v1-dependencies-{{ checksum "Gemfile.lock" }}
-          - v1-dependencies-
-
       - run:
           name: deploy demo
           command: eb deploy hipaa-sample-demo
@@ -122,11 +114,6 @@ jobs:
     <<: *defaults
     steps:
       - checkout
-
-      - restore_cache:
-          keys:
-          - v1-dependencies-{{ checksum "Gemfile.lock" }}
-          - v1-dependencies-
 
       - run:
           name: deploy production
