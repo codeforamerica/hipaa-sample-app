@@ -46,7 +46,7 @@ jobs:
 
       - run:
           name: tag as promoted
-          command: git tag v-$CIRCLE_JOB-$CIRCLE_SHA1; git push --tags
+          command: git tag v-$CIRCLE_BUILD_NUM; git push --tags
 
   deploy-demo:
     <<: *defaults
